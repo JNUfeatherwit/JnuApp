@@ -1,0 +1,16 @@
+{
+  "name": "jnuappserver",
+  "version": "0.0.1",
+  "private": true,
+  "description": "use for JnuApp",
+  "main": "App.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ZZ",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4",
+    "express-generator": "^4.16.1"
+  }
+}
