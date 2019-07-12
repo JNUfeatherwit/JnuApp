@@ -4269,6 +4269,11 @@ load-json-file@^4.0.0:
     pify "^3.0.0"
     strip-bom "^3.0.0"
 
+loadsh@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.npm.taobao.org/loadsh/download/loadsh-0.0.4.tgz#5314babd12bb13315dde024a4ca70758c5489d2d"
+  integrity sha1-UxS6vRK7EzFd3gJKTKcHWMVInS0=
+
 locate-path@^2.0.0:
   version "2.0.0"
   resolved "http://registry.npm.taobao.org/locate-path/download/locate-path-2.0.0.tgz#2b568b265eec944c6d9c0de9c3dbbbca0354cd8e"
@@ -4893,6 +4898,11 @@ mobx@^5.0.3:
   version "5.9.4"
   resolved "https://registry.npm.taobao.org/mobx/download/mobx-5.9.4.tgz#1dee92aba33f67b7baeeb679e3bd376a12e55812"
   integrity sha1-He6Sq6M/Z7e67rZ54703ahLlWBI=
+
+moment@^2.24.0:
+  version "2.24.0"
+  resolved "https://registry.npm.taobao.org/moment/download/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
+  integrity sha1-DQVdU/UFKqZTyfbraLtdEr9cK1s=
 
 morgan@^1.9.0:
   version "1.9.1"
@@ -5793,7 +5803,7 @@ react-native-vector-icons@^6.4.2:
 
 react-native@0.59.3:
   version "0.59.3"
-  resolved "http://registry.npm.taobao.org/react-native/download/react-native-0.59.3.tgz#b984bbe457f63d5515046d32ea5721fd22843548"
+  resolved "https://registry.npm.taobao.org/react-native/download/react-native-0.59.3.tgz#b984bbe457f63d5515046d32ea5721fd22843548"
   integrity sha1-uYS75Ff2PVUVBG0y6lch/SKENUg=
   dependencies:
     "@babel/runtime" "^7.0.0"

@@ -11,7 +11,7 @@ import { observer, inject } from 'mobx-react'
 import CountEmitter from '../event/CountEmitter'
 
 const { width } = Dimensions.get('window')
-@inject('tableStore')
+@inject('tableStore', 'newsStore', 'appStore', 'findStore')
 @observer
 class PublishMomentScreen extends Component {
   constructor(props) {
@@ -20,7 +20,8 @@ class PublishMomentScreen extends Component {
       selectedImages: [],
       content: '',
       username: '',
-      showProgress: false
+      showProgress: false,
+      account: this.props.appStore.user.uid
     }
     StorageUtil.get('username', (error, object) => {
       if (!error && object != null) {
@@ -53,7 +54,6 @@ class PublishMomentScreen extends Component {
           />
           {this.renderSelectedImages()}
         </View>
-
       </View>
     )
   }
@@ -66,13 +66,13 @@ class PublishMomentScreen extends Component {
     this.setState({ showProgress: false })
   }
 
-  sendMoment() {
+  async sendMoment() {
     let content = this.state.content
+    let account = this.state.account
     if (Utils.isEmpty(content)) {
+      alert('不能为空')
       return
     }
-    this.showLoading()
-    content = Base64Utils.encoder(content)
     let images = this.state.selectedImages
     let formData = new FormData()
     if (images.length > 0) {
@@ -83,39 +83,13 @@ class PublishMomentScreen extends Component {
         formData.append('file', file)
       }
     }
-    formData.append('username', 'hello')
+    formData.append('account', account)
     formData.append('content', content)
-
-    let url = 'http://app.yubo725.top/publishMoment'
-    // const  {momentList}=this.props.tableStore
-    // let list=momentList
-
-    //list.push(formData)
-    //this.props.tableStore.setMomentList(momentList)
-    // this.hideLoading()
-    // this.props.navigation.goBack()
-    fetch(url, { method: 'POST', body: formData })
-      .then(res => res.json())
-      .then(json => {
-        this.hideLoading()
-        if (json != null) {
-          if (json.code == 1) {
-            // 发送成功
-            // 通知朋友圈列表刷新
-            CountEmitter.emit('updateMomentList');
-            // 退出当前页面
-            this.props.navigation.goBack()
-          } else {
-            // 发送失败
-            let msg = json.msg
-            Toast.showShortCenter(msg)
-          }
-        }
-      })
-      .catch(e => {
-        this.hideLoading()
-        Toast.showShortCenter(e.toString())
-      })
+    await this.props.newsStore.upLoad(formData)
+    setTimeout(() => {
+      this.props.findStore.getDynamic(this.props.appStore.user.uid)
+      this.props.navigation.goBack()
+    }, 200)
   }
 
   renderImageItem(item, index) {
@@ -144,7 +118,7 @@ class PublishMomentScreen extends Component {
   renderImageRow(arr, start, end, isSecondRow) {
     let images = []
     for (let i = start; i < end; i++) {
-      if (i == -1) {
+      if (i === -1) {
         images.push(this.renderAddBtn())
       } else {
         images.push(this.renderImageItem(arr[i], i))

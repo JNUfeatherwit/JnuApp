@@ -71,7 +71,7 @@ export default class Header extends Component {
               {React.isValidElement(right.title) ? (
                 React.cloneElement(right.title)
               ) : (
-                <Text style={{ color: basicColor.blue }}>{right.title}</Text>
+                <Text style={{ color: basicColor.blue ,fontSize:16}}>{right.title}</Text>
               )}
             </TouchableOpacity>
           ))}

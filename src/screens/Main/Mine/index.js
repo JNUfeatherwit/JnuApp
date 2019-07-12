@@ -6,15 +6,26 @@ import React, { Component } from 'react'
 import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Header from '../../../component/Header'
 import { basicColor } from '../../../theme/MainStyle'
+import URL from '../../../env'
+import { inject, observer } from 'mobx-react'
 
+@inject('appStore')
+@observer
 class Mine extends Component {
   render() {
     return (
       <View style={styles.container}>
         <Header title={'个人中心'} noBack />
         <View style={styles.leftContainer}>
-          <Image style={styles.avatar} source={require('../../../img/avatar.png')} />
-          <Text style={{ fontSize: 18}}>hello</Text>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.navigation.navigate('UpdateImg')
+            }}
+          >
+            <Image style={styles.avatar} source={{ uri: `${URL}/public/${this.props.appStore.user.img}` }} />
+          </TouchableOpacity>
+          {/*<Image style={styles.avatar} source={{ uri: `${URL}/public/${this.props.appStore.user.img}` }} />*/}
+          <Text style={{ fontSize: 18 }}>{this.props.appStore.user.name}</Text>
         </View>
         <View style={{ alignItems: 'center', justifyContent: 'flex-end', flex: 1 }}>
           <TouchableOpacity

@@ -3,14 +3,15 @@
  * file description:
  */
 import React, { Component } from 'react'
-import { Button, StyleSheet, Text, View } from 'react-native'
-import { observer } from 'mobx-react'
+import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { inject, observer } from 'mobx-react'
 import { observable } from 'mobx'
 import FormProvider from './FormProvider'
 import FormItem from './FormItem'
-
+import {basicColor} from 'theme/MainStyle'
+@inject('appStore')
 @observer
-class App extends Component {
+class Login extends Component {
   form = new LoginForm()
 
   navigateHome = () => {
@@ -22,25 +23,11 @@ class App extends Component {
   }
 
   login = async () => {
-    let username = ''
 
-    let url = 'http://app.yubo725.top/login2'
-    let formData = new FormData()
-    formData.append('username', 'hello')
-    formData.append('password', 'hello')
 
-    fetch(url, { method: 'POST', body: formData })
-      .then(res => res.json())
-      .then(json => {
-        this.setState({ showProgress: false })
-        if (json.code === 1) {
-          this.loginSuccess()
-        } else {
-        }
-      })
-      .catch(e => {
-        this.setState({ showProgress: false })
-      })
+    const result=await this.props.appStore.signIn({...this.form})
+    result&&this.loginSuccess()
+
   }
 
   render() {
@@ -50,13 +37,18 @@ class App extends Component {
           <Text style={{ fontSize: 28, color: '#000' }}>登录</Text>
         </View>
         <FormProvider form={this.form}>
-          <FormItem name={'userName'} placeholder="请输入账号" defaultValue={'ss'}>
+          <FormItem name={'account'} placeholder="请输入账号" defaultValue={'ss'}>
             账号
           </FormItem>
           <FormItem name={'password'} type={'password'} placeholder="请输入密码">
             密码
           </FormItem>
         </FormProvider>
+        <View style={{flexDirection:'row',justifyContent:"flex-end"}}>
+          <TouchableOpacity onPress={()=>{this.props.navigation.navigate('Register')}} style={{padding:10}}>
+            <Text style={{color:basicColor.blue}}>注册</Text>
+          </TouchableOpacity>
+        </View>
         <View style={{ marginTop: 20, paddingHorizontal: 40 }}>
           <Button onPress={this.login} title={'登录'} />
         </View>
@@ -66,7 +58,7 @@ class App extends Component {
 }
 class LoginForm {
   @observable
-  userName = ''
+  account = ''
 
   @observable
   password = ''
@@ -80,4 +72,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default App
+export default Login

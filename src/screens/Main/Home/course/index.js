@@ -3,19 +3,32 @@
  * file description:
  */
 import React, { Component } from 'react'
-import {
-  Dimensions,
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native'
-import Button from '../../../../component/Button'
+import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Button } from '@ant-design/react-native'
 import Header from '../../../../component/Header'
+import Icon from 'react-native-vector-icons/Ionicons'
+import NavigationBar from '../index'
+import { inject, observer } from 'mobx-react'
+import URL from '../../../../env'
 
-
+@inject('newsStore', 'appStore')
+@observer
 class course extends Component {
+  componentDidMount() {
+    this.init()
+  }
+  init = () => {
+    this.props.newsStore.getCourseList()
+  }
+  handleDeleteCourse = async classNum => {
+    if (this.props.appStore.user.power == 1) {
+      await this.props.newsStore.deleteCourse(classNum)
+    } else alert('只有管理员才可以执行该操作')
+    setTimeout(() => {
+      this.props.newsStore.getCourseList()
+    }, 200)
+  }
+
   renderItem = item => {
     return (
       <View
@@ -23,91 +36,50 @@ class course extends Component {
           flexDirection: 'row',
           flex: 1,
           paddingTop: 10,
+          paddingHorizontal: 10,
           paddingBottom: 10
-        }}>
-        <Image source={item.image} style={styles.imgStyle} />
+        }}
+      >
+        <Image source={{ uri: `${URL}/public/${item.img}` }} style={styles.imgStyle} />
         <View style={{ flex: 1 }}>
-          <Text style={styles.name}>{item.title}</Text>
-          <Text style={styles.name}>{item.teacher}</Text>
-          <Text style={styles.name}>{item.no}</Text>
+          <Text style={styles.name}>{item.className}</Text>
+          <Text style={styles.name}>{item.totalTeacher}</Text>
+          <Text style={styles.name}>{item.classNum}</Text>
         </View>
+        <TouchableOpacity
+          style={{ paddingHorizontal: 10, justifyContent: 'center' }}
+          onPress={() => this.handleDeleteCourse(item.classNum)}
+        >
+          <Icon name="ios-close" size={30} />
+        </TouchableOpacity>
       </View>
     )
   }
   render() {
+    const { courseList } = this.props.newsStore
     return (
       <View style={styles.container}>
-        <Header title={'社团活动'} />
+        <Header
+          title={'开课列表'}
+          right={
+            <Button
+              type={'primary'}
+              onPress={() => {
+                if (this.props.appStore.user.power == 1) {
+                  this.props.navigation.navigate('addCourse')
+                } else {
+                  alert('只有管理员才可以执行该操作')
+                }
+              }}
+            >
+              添加
+            </Button>
+          }
+        />
         <FlatList
-          data={[
-            {
-              title: '高等数学',
-              image: require('../../../../assets/GS.jpg'),
-              teacher: '窦庆萍',
-              no: '课程编号：001'
-            },
-            {
-              title: '概率论与数理统计',
-              image: require('../../../../assets/GLL.jpg'),
-              teacher: '刘中学',
-              no: '课程编号：002'
-            },
-            {
-              title: '离散数学',
-              image: require('../../../../assets/LS.jpg'),
-              teacher: '周密、陈双平',
-              no: '课程编号：003'
-            },
-            {
-              title: '马克思主义基本原理概论',
-              image: require('../../../../assets/MZ.jpg'),
-              teacher: '袁一达',
-              no: '课程编号：004'
-            },
-            {
-              title: '大学体育',
-              image: require('../../../../assets/TY.jpg'),
-              teacher: '窦庆萍',
-              no: '课程编号：005'
-            },
-            {
-              title: '线性代数',
-              image: require('../../../../assets/XD.gif'),
-              teacher: '窦庆萍',
-              no: '课程编号：006'
-            },
-            {
-              title: '商务英语视听说',
-              image: require('../../../../assets/SWYY.jpg'),
-              teacher: '吴瑾',
-              no: '课程编号：007'
-            },
-            {
-              title: '数字电子技术',
-              image: require('../../../../assets/XD.gif'),
-              teacher: '秦岭松',
-              no: '课程编号：008'
-            },
-            {
-              title: 'python程序设计',
-              image: require('../../../../assets/Python.jpg'),
-              teacher: '林聪',
-              no: '课程编号：009'
-            },
-            {
-              title: 'Java程序设计',
-              image: require('../../../../assets/JAVA.gif'),
-              teacher: '王勇杰',
-              no: '课程编号：010'
-            },
-            {
-              title: '大学生心理健康',
-              image: require('../../../../assets/DX.jpg'),
-              teacher: '王佩佩',
-              no: '课程编号：011'
-            }
-          ]}
+          data={courseList}
           renderItem={({ item }) => this.renderItem(item)}
+          keyExtractor={item => item.classNum}
         />
       </View>
     )

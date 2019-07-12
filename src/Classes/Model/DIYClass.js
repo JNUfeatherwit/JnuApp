@@ -7,29 +7,26 @@ import { observer, inject } from 'mobx-react'
 import Header from '../../component/Header'
 const { width, height } = Dimensions.get('window')
 
-@inject('tableStore')
+@inject('tableStore', 'appStore')
 @observer
 class DIYClass extends Component {
   constructor(props) {
     super(props)
     this.state = {
       week: '一',
-      time: '',
-      fclassName: '',
-      fPlace: '',
-      fTeachar: '',
-      totalTeacher: [],
-      id: ''
+      classTime: '1~2',
+      className: '',
+      place: '',
+      totalTeacher: '',
+      classNum: ''
     }
   }
   render() {
-    // alert(this.state.zhouqi);
     return (
       <View style={styles.container}>
         <Header title={'自定义课程'} />
         <View style={styles.textWrap}>
           <Text style={styles.textName}>课程名称：</Text>
-          {/*<Text style={styles.textMessage}>小狐狸</Text>*/}
           <TextInput
             placeholder="请输入课程名称"
             underlineColorAndroid="transparent"
@@ -37,27 +34,15 @@ class DIYClass extends Component {
             style={styles.textMessage}
             onChangeText={text => {
               this.setState({
-                fclassName: text
+                className: text
               })
             }}
           >
-            {this.state.fclassName}
+            {this.state.className}
           </TextInput>
-          <View style={{ width: 50, position: 'absolute', right: 5 }}>
-            <Button
-              title={'更新'}
-              onPress={() => {
-                const newClass = this.props.tableStore.getClass(this.state.fclassName)
-                if (newClass) {
-                  this.setState(newClass)
-                }
-              }}
-            />
-          </View>
         </View>
         <View style={styles.textWrap}>
           <Text style={styles.textName}>课程编号：</Text>
-          {/*<Text style={styles.textMessage}>小狐狸</Text>*/}
           <TextInput
             placeholder="请输入课程编号"
             underlineColorAndroid="transparent"
@@ -65,17 +50,17 @@ class DIYClass extends Component {
             style={styles.textMessage}
             onChangeText={text => {
               this.setState({
-                id: text
+                classNum: text
               })
             }}
           >
-            {this.state.id}
+            {this.state.classNum}
           </TextInput>
           <View style={{ width: 50, position: 'absolute', right: 5 }}>
             <Button
               title={'更新'}
-              onPress={() => {
-                const newClass = this.props.tableStore.getId(this.state.id)
+              onPress={async () => {
+                const newClass = await this.props.tableStore.getId(this.state.classNum)
                 if (newClass) {
                   this.setState(newClass)
                 }
@@ -92,24 +77,28 @@ class DIYClass extends Component {
             style={styles.textMessage}
             onChangeText={text => {
               this.setState({
-                fPlace: text
+                place: text
               })
             }}
           >
-            {this.state.fPlace}
+            {this.state.place}
           </TextInput>
         </View>
         <View style={styles.textWrap}>
           <Text style={styles.textName}>上课教师：</Text>
-          <Picker
-            style={{ width: (width * 2) / 3, position: 'absolute', right: 0 }}
-            selectedValue={this.state.fTeachar}
-            onValueChange={value => this.setState({ fTeachar: value })}
+          <TextInput
+            placeholder="请输入上课教师"
+            underlineColorAndroid="transparent"
+            keyboardType="default"
+            style={styles.textMessage}
+            onChangeText={text => {
+              this.setState({
+                totalTeacher: text
+              })
+            }}
           >
-            {this.state.totalTeacher.map((value, i) => (
-              <Picker.Item label={value} value={value} key={i.toString} />
-            ))}
-          </Picker>
+            {this.state.totalTeacher}
+          </TextInput>
         </View>
         <View style={styles.textWrap}>
           <Text style={styles.textName}>星期：</Text>
@@ -131,8 +120,8 @@ class DIYClass extends Component {
           <Text style={styles.textName}>课时：</Text>
           <Picker
             style={{ width: (width * 4) / 5, position: 'absolute', right: 0 }}
-            selectedValue={this.state.time}
-            onValueChange={value => this.setState({ time: value })}
+            selectedValue={this.state.classTime}
+            onValueChange={value => this.setState({ classTime: value })}
           >
             <Picker.Item label="1~2" value="1~2" />
             <Picker.Item label="3~4" value="3~4" />
@@ -146,7 +135,6 @@ class DIYClass extends Component {
           style={styles.btn}
           onPress={() => {
             this._fetchData()
-
           }}
         >
           <Text style={styles.btnText}>添加</Text>
@@ -154,57 +142,21 @@ class DIYClass extends Component {
       </View>
     )
   }
-  _fetchData() {
-    if (!this.state.id) {
+  _fetchData = async () => {
+    if (!this.state.classNum) {
       alert('请输入课程编号')
       return
     }
-    const { tableList } = this.props.tableStore
-    let key = ''
-    switch (this.state.week) {
-      case '一':
-        key = 'Mon'
-        break
-      case '二':
-        key = 'Tus'
-        break
-      case '三':
-        key = 'Wes'
-        break
-      case '四':
-        key = 'Thu'
-        break
-      case '五':
-        key = 'Fri'
-        break
-      case '六':
-        key = 'Sat'
-        break
-      case '日':
-        key = 'Sun'
-        break
-    }
-    if (!key) {
-      return
-    }
-    const list = tableList[key]
-    for (let i = 0; i < list.length; i++) {
-      if (list[i].id === this.state.id) {
-        list.splice(i, i + 1)
-        break
-      }
-    }
-    list.push({
-      fweek: this.state.week,
-      fclassName: this.state.fclassName,
-      fPlace: this.state.fPlace,
-      fClasstime: this.state.time,
-      fTeachar: this.state.fTeachar,
-      id: this.state.id
+    const result = await this.props.tableStore.addUserCourse({
+      week: this.state.week,
+      className: this.state.className,
+      place: this.state.place,
+      classTime: this.state.classTime,
+      totalTeacher: this.state.totalTeacher,
+      classNum: this.state.classNum,
+      account: this.props.appStore.user.uid
     })
-    tableList[key] = list
-    this.props.tableStore.setTableList(tableList)
-    this.props.navigation.goBack()
+    result && this.props.navigation.goBack()
   }
 }
 const styles = StyleSheet.create({

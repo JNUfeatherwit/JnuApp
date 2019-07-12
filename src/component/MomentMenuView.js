@@ -30,14 +30,7 @@ export default class MomentMenuView extends Component {
             style={[styles.modalContainer, { height: this.state.height }]}
             onPress={() => this.closeModal()}
           >
-            <View style={[styles.container, { left: this.state.pageX - 200, top: this.state.pageY - 20 }]}>
-              <TouchableOpacity onPress={() => this.doFavor()}>
-                <View style={styles.menuItemContainer}>
-                  <Image style={styles.menuItemImg} source={require('../img/ic_moment_favor.png')} />
-                  <Text style={styles.menuItemText}> 赞 </Text>
-                </View>
-              </TouchableOpacity>
-              <View style={styles.divider} />
+            <View style={[styles.container, { left: this.state.pageX - 120, top: this.state.pageY-50  }]}>
               <TouchableOpacity onPress={() => this.doComment()}>
                 <View style={styles.menuItemContainer}>
                   <Image style={styles.menuItemImg} source={require('../img/ic_moment_comment.png')} />
@@ -59,33 +52,6 @@ export default class MomentMenuView extends Component {
     this.closeModal()
   }
 
-  doFavor() {
-    let momentId = this.state.momentId
-    if (!Utils.isEmpty(momentId)) {
-      let url = 'http://app.yubo725.top/favor'
-      let formData = new FormData()
-
-      formData.append('username', 'hello')
-      formData.append('momentId', momentId)
-      fetch(url, { method: 'POST', body: formData })
-        .then(res => res.json())
-
-        .then(json => {
-          if (!Utils.isEmpty(json)) {
-            if (json.code == 1) {
-              // 需要刷新页面
-              let callback1 = this.state.callback1
-              if (!Utils.isEmpty(callback1)) {
-                callback1(json.msg)
-              }
-            } else {
-            }
-          }
-        })
-        .catch(e => {})
-    }
-    this.closeModal()
-  }
 
   closeModal() {
     this.setState({ show: false, height: 0 })
@@ -115,7 +81,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    width: 180,
+    width: 100,
     padding: 5,
     height: 35,
     position: 'absolute',

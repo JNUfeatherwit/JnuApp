@@ -8,7 +8,7 @@ const navigatorH = 64 // navigator height
 const [aWidth, aHeight] = [width - 28, 214]
 const [left, top] = [0, 0]
 const [middleLeft, middleTop] = [(width - aWidth) / 2, (height - aHeight) / 2 - navigatorH]
-@inject('tableStore')
+@inject('tableStore','appStore')
 
 @observer
 export default class Index extends Component {
@@ -80,7 +80,9 @@ export default class Index extends Component {
                 <View style={styles.shareWrap}>
                   <TouchableOpacity
                     style={styles.shareBtn}
-                    onPress={this._setModalVisibleJump.bind(this, 'SchoolImport')}
+                    onPress={async ()=>{await this.props.tableStore.loadCourses(this.props.appStore.user.uid)
+                      this._setModalVisible(false)
+                    }}
                   >
                     <Image style={styles.shareImg} source={require('../img/daoru.png')} />
                   </TouchableOpacity>
@@ -91,34 +93,6 @@ export default class Index extends Component {
                     <Image style={styles.shareImg} source={require('../img/zidingyi.png')} />
                   </TouchableOpacity>
                   <Text style={styles.shareText}>自定义</Text>
-                </View>
-              </View>
-              <View style={styles.rowWrap}>
-                <View style={styles.row}>
-                  <Text style={styles.rowTitle}>当前学期:</Text>
-                  <View style={styles.rowContent}>
-                    <Text> 第</Text>
-                    <TextInput
-                      style={{ bottom: 15, textAlign: 'center' }}
-                      underlineColorAndroid={'#999'}
-                      value={this.props.tableStore.curTerm}
-                      onChangeText={(text) => {this.props.tableStore.setCurTerm(text)}}
-                    />
-                    <Text>学期</Text>
-                  </View>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.rowTitle}>当前周数:</Text>
-                  <View style={styles.rowContent}>
-                    <Text> 第</Text>
-                    <TextInput
-                      style={{ bottom: 15, textAlign: 'center' }}
-                      underlineColorAndroid={'#999'}
-                      value={this.props.tableStore.curWeek}
-                      onChangeText={(text) => {this.props.tableStore.setCurWeek(text)}}
-                    />
-                    <Text>周</Text>
-                  </View>
                 </View>
               </View>
             </View>

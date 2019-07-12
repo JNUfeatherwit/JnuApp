@@ -9,12 +9,11 @@ import Header from '../../../component/Header'
 import { basicStyle } from '../../../theme/MainStyle'
 import Classes from '../../../Classes'
 
-
 class Timetable extends Component {
   render() {
     return (
-      <View style={[basicStyle.container,styles.container]}>
-        <Classes navigation={this.props.navigation}/>
+      <View style={[basicStyle.container, styles.container]}>
+        <Classes navigation={this.props.navigation} />
       </View>
     )
   }
@@ -22,7 +21,7 @@ class Timetable extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop:24
+    paddingTop: 24
   }
 })
 export default Timetable

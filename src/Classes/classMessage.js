@@ -1,18 +1,11 @@
 import React, { Component } from 'react'
-import {
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  Platform,
-  Dimensions,
-  View
-} from 'react-native'
+import { StyleSheet, TouchableOpacity, Text, Platform, Dimensions, View } from 'react-native'
 
 import { observer, inject } from 'mobx-react'
 import Header from '../component/Header'
 const { width, height } = Dimensions.get('window')
 
-@inject('tableStore')
+@inject('tableStore', 'appStore')
 @observer
 class ClassMessage extends Component {
   constructor(props) {
@@ -22,6 +15,7 @@ class ClassMessage extends Component {
       item: ''
     }
   }
+
   render() {
     // alert(this.props.navigation.state.params.MyID);
     return (
@@ -31,66 +25,31 @@ class ClassMessage extends Component {
         <View style={styles.textWrap}>
           <Text style={styles.textName}>课程名称：</Text>
           <Text style={styles.textMessage} numberOfLines={1}>
-            {this.props.navigation.state.params.item.fclassName}
+            {this.props.navigation.state.params.item.className}
           </Text>
         </View>
         <View style={styles.textWrap}>
           <Text style={styles.textName}>上课地点：</Text>
-          <Text style={styles.textMessage}>{this.props.navigation.state.params.item.fPlace}</Text>
+          <Text style={styles.textMessage}>{this.props.navigation.state.params.item.place}</Text>
         </View>
         <View style={styles.textWrap}>
           <Text style={styles.textName}>上课教师：</Text>
-          <Text style={styles.textMessage}>{this.props.navigation.state.params.item.fTeachar}</Text>
+          <Text style={styles.textMessage}>{this.props.navigation.state.params.item.totalTeacher}</Text>
         </View>
         <View style={styles.textWrap}>
           <Text style={styles.textName}>星期：</Text>
-          <Text style={styles.textMessage}>{this.props.navigation.state.params.item.fweek}</Text>
+          <Text style={styles.textMessage}>{this.props.navigation.state.params.item.week}</Text>
         </View>
         <View style={styles.textWrap}>
           <Text style={styles.textName}>课时：</Text>
-          <Text style={styles.textMessage}>{this.props.navigation.state.params.item.fClasstime}</Text>
+          <Text style={styles.textMessage}>{this.props.navigation.state.params.item.classTime}</Text>
         </View>
 
         <TouchableOpacity
           style={styles.btn}
           onPress={() => {
-            const { tableList } = this.props.tableStore
-            let key = ''
-            switch (this.props.navigation.state.params.item.fweek) {
-              case '一':
-                key = 'Mon'
-                break
-              case '二':
-                key = 'Tus'
-                break
-              case '三':
-                key = 'Wes'
-                break
-              case '四':
-                key = 'Thu'
-                break
-              case '五':
-                key = 'Fri'
-                break
-              case '六':
-                key = 'Sat'
-                break
-              case '日':
-                key = 'Sun'
-                break
-            }
-            if (!key) {
-              return
-            }
-            const list = tableList[key]
-            for (let i = 0; i < list.length; i++) {
-              if (list[i].id === this.props.navigation.state.params.item.id) {
-                list.splice(i, i + 1)
-                break
-              }
-            }
-            tableList[key] = list
-            this.props.tableStore.setTableList(tableList)
+            this.props.tableStore.deleteSchedule(this.props.navigation.state.params.item.scheduleNum)
+            this.props.tableStore.getUserCourseList(this.props.appStore.user.uid)
             this.props.navigation.goBack()
           }}
         >

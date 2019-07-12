@@ -3,42 +3,11 @@
  * file description:
  */
 import { observable } from 'mobx'
-const totalCourses = [
-  {
-    fclassName: 'c',
-    fPlace: 'c205',
-    id: '00010',
-    fClasstime: '1~2',
-    fweek: '一',
-    totalTeacher: ['刘老师', '张老师', '李老师']
-  },
-  {
-    fclassName: 'a',
-    fPlace: 'c405',
-    id: '00001',
-    fClasstime: '1~2',
-    fweek: '二',
-    totalTeacher: ['李老师']
-  },
-  {
-    fclassName: 'b',
-    fPlace: 'c413',
-    id: '00011',
-    fClasstime: '1~2',
-    fweek: '三',
-    totalTeacher: ['刘老师', '张老师', '李老师']
-  },
-  {
-    fclassName: 'cd',
-    fPlace: 'c207',
-    id: '00100',
-    fClasstime: '3~4',
-    fweek: '五',
-    totalTeacher: ['张老师', '李老师']
-  }
-]
+import URL from '../src/env'
+import { inject } from 'mobx-react'
 
 export default class TableStore {
+  @observable totalCourses = []
   @observable tableList = {
     Mon: [],
     Tus: [],
@@ -50,7 +19,7 @@ export default class TableStore {
   }
   @observable curWeek = ''
   @observable curTerm = ''
-  @observable momentList=[]
+  @observable momentList = []
 
   setCurWeek = week => {
     this.curWeek = week
@@ -58,37 +27,155 @@ export default class TableStore {
   setCurTerm = term => {
     this.curTerm = term
   }
-  setMomentList=data=>{
-    this.momentList=data
+  setMomentList = data => {
+    this.momentList = data
   }
-  getClass = className => {
-    for (let item of totalCourses) {
-      if (item.fclassName === className) {
-        return {
-          week: item.fweek,
-          time: item.fClasstime,
-          fPlace: item.fPlace,
-          totalTeacher: item.totalTeacher,
-          id: item.id
-        }
+
+  loadCourses = async account => {
+    try {
+      const response = await fetch(`${URL}/createdSchedule`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ account })
+      })
+      const data = await response.json()
+      let list = {
+        Mon: [],
+        Tus: [],
+        Wes: [],
+        Thu: [],
+        Fri: [],
+        Sat: [],
+        Sun: []
       }
+      for (let item of data) {
+        let key = 'Mon'
+        switch (item.week) {
+          case '一':
+            key = 'Mon'
+            break
+          case '二':
+            key = 'Tus'
+            break
+          case '三':
+            key = 'Wes'
+            break
+          case '四':
+            key = 'Thu'
+            break
+          case '五':
+            key = 'Fri'
+            break
+          case '六':
+            key = 'Sat'
+            break
+          case '日':
+            key = 'Sun'
+            break
+        }
+        list[key].push(item)
+        this.tableList = list
+      }
+    } catch (e) {
+      console.warn(e)
     }
   }
-  getId = id => {
-    for (let item of totalCourses) {
-      if (item.id === id) {
-        return {
-          fclassName: item.fclassName,
-          week: item.fweek,
-          time: item.fClasstime,
-          fPlace: item.fPlace,
-          totalTeacher: item.totalTeacher,
-          id: item.id
-        }
+
+  async getUserCourseList(account) {
+    try {
+      const response = await fetch(`${URL}/getSchedule`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ account })
+      })
+
+      const data = await response.json()
+      let list = {
+        Mon: [],
+        Tus: [],
+        Wes: [],
+        Thu: [],
+        Fri: [],
+        Sat: [],
+        Sun: []
       }
+      for (let item of data) {
+        let key = 'Mon'
+        switch (item.week) {
+          case '一':
+            key = 'Mon'
+            break
+          case '二':
+            key = 'Tus'
+            break
+          case '三':
+            key = 'Wes'
+            break
+          case '四':
+            key = 'Thu'
+            break
+          case '五':
+            key = 'Fri'
+            break
+          case '六':
+            key = 'Sat'
+            break
+          case '日':
+            key = 'Sun'
+            break
+        }
+        list[key].push(item)
+        this.tableList = list
+      }
+    } catch (e) {
+      console.warn(e)
     }
   }
-  setTableList = list => {
-    Object.assign(this.tableList, list)
+  async deleteSchedule(scheduleNum) {
+    try {
+      fetch(`${URL}/deleteSchedule`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ scheduleNum })
+      }).then(() => {})
+    } catch (e) {
+      console.warn(e)
+    }
+  }
+  addUserCourse = async course => {
+    try {
+      await fetch(`${URL}/addSchedule`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(course)
+      })
+      return true
+    } catch (e) {
+      console.warn(e)
+    }
+  }
+
+  getId = async classNum => {
+    try {
+      const dataJson = await fetch(`${URL}/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ classNum })
+      })
+      const data = await dataJson.json()
+      return data[0]
+    } catch (e) {
+      console.warn(e)
+    }
   }
 }

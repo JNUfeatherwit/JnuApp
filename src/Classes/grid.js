@@ -18,7 +18,7 @@ const colors = [
   '#d4ffe1'
 ]
 
-@inject('tableStore')
+@inject('tableStore', 'appStore')
 @observer
 class Grids extends Component {
   constructor(props) {
@@ -34,14 +34,15 @@ class Grids extends Component {
       Sun: this.props.Sun
     }
   }
+
   _keyExtractor = (item, index) => index.toString()
   _renderItem = ({ item, index }) => {
     var num = Math.floor(Math.random() * 10)
-    var strss = item.fClasstime.split('~')
+    var strss = item.classTime.split('~')
     var heights = (strss[1] - strss[0] + 1) * 65
     var Dates = []
     const { tableList } = this.props.tableStore
-    switch (item.fweek) {
+    switch (item.week) {
       case '一':
         Dates = tableList.Mon
         break
@@ -68,7 +69,7 @@ class Grids extends Component {
       var marginTop = (strss[0] - 1) * 65
     } else {
       let BefIndex = index - 1
-      let Befstr = Dates[BefIndex].fClasstime.split('~')
+      let Befstr = Dates[BefIndex].classTime.split('~')
       // alert(Befstr[0]);
       var marginTop = (strss[0] - Befstr[1] - 1) * 65
     }
@@ -91,7 +92,7 @@ class Grids extends Component {
           }}
         >
           <Text style={styles.color}>
-            {item.fclassName}@{item.fPlace}
+            {item.className}@{item.place}
           </Text>
         </TouchableOpacity>
       </View>
@@ -313,8 +314,17 @@ class Grids extends Component {
   }
   componentDidMount() {
     this._fetchData()
+    this.didBlurSubscription = this.props.navigation.addListener('didFocus', payload => {
+      this._fetchData()
+    })
   }
-  _fetchData() {}
+  componentWillUnmount() {
+    this.didBlurSubscription.remove()
+  }
+
+  _fetchData() {
+    this.props.tableStore.getUserCourseList(this.props.appStore.user.uid)
+  }
 }
 
 const styles = StyleSheet.create({
